@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Mosquitto Websockets</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
+	<script  src="https://code.jquery.com/jquery-3.2.1.js"  integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+  crossorigin="anonymous"></script>
+
+    <script src="js/load_config.js" type="text/javascript"></script>
+    <script src="js/register_config.js" type="text/javascript"></script>
+    <script src="js/register.js" type="text/javascript"></script>
+
+	<script type="text/javascript"> 
+
+    $(document).ready(function() {
+    $("input.tst").on("change paste keyup", function() {
+	   console.log($(this).val()); 
+		});
+    });
+    
+
+    </script>
+  </head>
+  <body>
+
+  <h1><div id='reg_name' >__REG</div></h1>
+  <div id='reg_desc'>__DESC</div>
+
+  <table id='reg_fields' border=2>
+  </table> 
+  <button id='send'>SEND</button>
+
+    <h1>Mosquitto Websockets</h1>
+    <div>
+        <div>Subscribed to <input class='tst' type='text' id='topic'  />
+        Status: <input type='text' id='status' size="80" disabled />
+        </div>
+
+        <ul id='ws' style="font-family: 'Courier New', Courier, monospace;"></ul>
+    </div>
+  </body>
+</html>

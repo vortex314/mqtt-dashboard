@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Mosquitto Websockets</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
+	<script  src="https://code.jquery.com/jquery-3.2.1.js"  integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+  crossorigin="anonymous"></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+  <script src="https://jqwidgets.com/public/jqwidgets/jqx-all.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="https://jqwidgets.com/public/jqwidgets/styles/jqx.darkblue.css" />
+
+    <script src="js/load_config.js" type="text/javascript"></script>
+    <script src="js/register_config.js" type="text/javascript"></script>
+    <script src="js/register.js" type="text/javascript"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+
+	<script type="text/javascript"> 
+	var mqtt; 
+	var reconnectTimeout =	2000;
+	var services={};
+	var myService = "browser."+parseInt(Math.random() * 10000, 10);
+	var myDstService = "dst/"+myService;
+	var mySrcService ="src/"+myService;
+	var memoryServices=[];
+	sheetUrl="https://docs.google.com/spreadsheets/d/1BNLxDNru_yCzKDj1i8CG6zDpSrbQNrcUdwg9t4SSN6A/edit?usp=sharing"
+	sheetUrl2="https://docs.google.com/spreadsheets/d/1BNLxDNru_yCzKDj1i8CG6zDpSrbQNrcUdwg9t4SSN6A/edit?usp=sharing?alt=json-in-script&callback=x"
+	sheetUrl3="https://spreadsheets.google.com/feeds/list/1BNLxDNru_yCzKDj1i8CG6zDpSrbQNrcUdwg9t4SSN6A/od6/public/values?alt=json-in-script&callback=x"
+
+var spreadsheetID = "1BNLxDNru_yCzKDj1i8CG6zDpSrbQNrcUdwg9t4SSN6A";
+
+ // Make sure it is public or set to Anyone with link can view 
+ var url = "https://spreadsheets.google.com/feeds/list/" + spreadsheetID + "/od6/public/values?alt=json";
+ 
+ function log(s) {
+ 	console.log(s);
+ }
+
+
+   function MQTTconnect() {
+	if (typeof path == "undefined") {
+		path = '/mqtt';
+	}
+	mqtt = new Paho.MQTT.Client(
+			host,
+			port,
+			path,
+			myService
+	);
+        var options = {
+            timeout: 3,
+            useSSL: useTLS,
+            cleanSession: cleansession,
+            onSuccess: onConnect,
+            onFailure: function (message) {
+                $('#status').val("Connection failed: " + message.errorMessage + "Retrying");
+                setTimeout(MQTTconnect, reconnectTimeout);
+            }
+        };
+
+        mqtt.onConnectionLost = onConnectionLost;
+        mqtt.onMessageArrived = onMessageArrived;
+
+        if (username != null) {
+            options.userName = username;
+            options.password = password;
+        }
+        console.log("Host="+ host + ", port=" + port + ", path=" + path + " TLS = " + useTLS + " username=" + username + " password=" + password);
+        mqtt.connect(options);
+    }
+
+    function onConnect() {
+        log('Connected to ' + host + ':' + port + path);
+        // Connection succeeded; subscribe to our topic
+        log("subscribing to topic : dst/"+myService);
+        mqtt.subscribe("dst/"+myService, {qos: 0});
+        log("subscribing to topic : "+"src/services/memory");
+        mqtt.subscribe("src/services/memory",{qos: 0});
+        mqttPublish(mySrcService,"alive");
+    }
+
+    function onConnectionLost(response) {
+        setTimeout(MQTTconnect, reconnectTimeout);
+        log("connection lost: " + response.errorMessage + ". Reconnecting");
+
+    };
+
+    function onMessageArrived(message) {
+
+        var topic = message.destinationName;
+        var payload = JSON.parse(message.payloadString);
+        if ( topic ==="src/services/memory" ) {
+        	if ( memoryServices.indexOf(payload) == -1) {
+        		memoryServices.push(payload);
+        		log(" added memoryService : "+payload);
+        		}
+        	} else {
+        		log(" other payload :"+payload);
+        	}
+    };
+    
+    function mqttPublish(topic,message) {
+    	msg = new Paho.MQTT.Message(message);
+  		msg.destinationName = topic;
+  		mqtt.send(msg);
+    }
+    
+    function sheetLoader(url) {
+		$.getJSON(url, function(data) {
+  		var entry = data.feed.entry;
+  		var list=[];
+
+  		$(entry).each(function(){
+  			entry = {};
+  			entry.controller = this.gsx$controller.$t;
+  			entry.address = this.gsx$address.$t;
+  			entry.register= this.gsx$register.$t;
+  			entry.field= this.gsx$field.$t;
+  			entry.offset= this.gsx$offset.$t;
+  			entry.len= this.gsx$length.$t;
+  			entry.desc= this.gsx$desc.$t;
+  			list.push(entry);
+//  			console.log(this.content.$t);
+  			
+    			// Column names are name, age, etc.
+				//    $('.results').prepend('<h2>'+this.gsx$name.$t+'</h2><p>'+this.gsx$age.$t+'</p>');
+  			});
+
+ 			});
+    }
+    
+    		var app = angular.module('myApp', []);
+			app.controller('myCtrl', function($scope) {
+    			$scope.names = ["Emil", "Tobias", "Linus"];
+				});
+				
+				JavaScript:
+
+// global variable outside angular
+var variable1 = true;
+
+var app = angular.module('myapp', []);
+
+app.controller('MainCtrl', ['$scope', '$window', function($scope, $window) {
+  $scope.variable1 = $window.variable1;
+}]);
+
+    
+
+    $(document).ready(function() {
+     	sheetLoader(url);
+
+    setInterval(function() {
+    	mqttPublish(mySrcService+"/alive",JSON.stringify(true))},5000);
+    
+        $("input.tst").on("change paste keyup", function() {
+		   	console.log($(this).val()); 
+			});
+        MQTTconnect();
+      $('select#service_selected').change(function(){
+    			register.service=$(this).val();
+    			loadRegister(register);
+    			});
+    	$('select#register_selected').change(function(){
+    			register.service=$(this).val();
+    			loadRegister(register);
+    			});
+
+        register = ESP8266.SPI1_CTRL2;
+        showRegister(register);
+    });
+      </script>
+  </head>
+  <body>
+  	<div ng-app="myApp" ng-controller="myCtrl"> Services
+  		<select ng-model="selectedName" ng-options="x for x in names"></select>
+	</div>
+	
+	<section ng-app="myapp" ng-controller="MainCtrl">
+  Value of global variable read by AngularJS: {{variable1}}
+</section>
+
+  <table>
+  <tr>
+  <td><div id='reg_name' >__REG</div></td>
+  <td>=0x</td><td><div id='reg_value'></div></td>
+  </tr>
+  </table>
+  <table id='reg_fields' border=2>
+  </table> 
+  <button id='send'>SEND</button>
+
+    <h1>Mosquitto Websockets</h1>
+    <div>
+        <div>Subscribed to <input class='tst' type='text' id='topic'  />
+        Status: <input type='text' id='status' size="80" disabled />
+        </div>
+
+        <ul id='ws' style="font-family: 'Courier New', Courier, monospace;"></ul>
+    </div>
+  </body>
+</html>

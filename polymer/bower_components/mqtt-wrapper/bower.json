@@ -1,0 +1,30 @@
+{
+  "name": "mqtt-wrapper",
+  "version": "1.4.0",
+  "authors": [
+    "Sebastian Raff <hq@ccu.io>"
+  ],
+  "description": "Polymer Element that wraps other Elements and links them to MQTT topics",
+  "main": "mqtt-wrapper.html",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "mqtt"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/hobbyquaker/mqtt-wrapper",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "mqtt-connection": "hobbyquaker/mqtt-connection#*"
+  },
+  "devDependencies": {
+    "iron-component-page": "^3.0.1"
+  }
+}

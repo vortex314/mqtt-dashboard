@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.js" integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+        crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+        crossorigin="anonymous">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
+    <script src="js/util.js" type="text/javascript"></script>
+    <script src="js/eventbus.js" type="text/javascript"></script>
+
+    <script type="text/javascript" src="js/mqtt.js"></script>
+    <script type="text/javascript">
+        google.load('visualization', '1', { packages: ['corechart', 'controls'] });
+        google.setOnLoadCallback(start);
+        eventbus = Minibus.create();
+        eventbus.on(".*", (arg) => log('eventbus => ' + JSON.stringify(arg)));
+
+        myMqtt = new MyMqtt("limero.ddns.net", 1884);
+
+        function drawProgress(dom, value) {
+            w = Math.round(value * 100.0);
+            $(dom).css('width', w / 10 + '%').attr('aria-valuenow', w).html(JSON.stringify(w));
+            log(w);
+        }
+
+        function start() {
+            log("STARTED   !");
+            eventbus.on("EVENT:ESP15A281.ANCHOR:distance", (msg) => drawProgress("#anchor1", msg.data));
+            eventbus.on("EVENT:ESPF3A17C.ANCHOR:distance", (msg) => drawProgress("#anchor2", msg.data));
+            $("#slider").slider();
+            $("#slider").on("slidechange", function (event, ui) {
+                log(" slider value " + ui.value);
+                myMqtt.publish("dst/ESP7C40A24.Led/slider", ui.value);
+            });
+        }
+    </script>
+    <style>
+        #slider {
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <button class="btn btn-primary" onclick="myMqtt.connect();">Connect</button>
+    <button class="btn btn-primary" onclick="myMqtt.subscribe('src/+/distance');">Subscribe</button>
+    <button class="btn btn-primary" onclick="myMqtt.publish('src/'+myMqtt.src()+'/test',123.55);">Publish</button>
+    <button class="btn btn-primary" onclick="myMqtt.disconnect();">Disconnect</button>
+    <div id="slider"></div>
+    <div class="progress">
+        <div id="anchor1" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="1000"
+            style="width:40%">
+            40% Complete
+        </div>
+    </div>
+    <div class="progress">
+        <div id="anchor2" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="1000"
+            style="width:40%">
+            40% Complete
+        </div>
+    </div>
+    <div id=" status ">--</div>
+    <div id="log ">--</div>
+    <div id="chart_div" style="width: 900px; height: 500px; "></div>
+</body>
+
+</html>

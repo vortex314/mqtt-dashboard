@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1">
+
+<head>
+    <!--    <link href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/classic/theme-classic/resources/theme-classic-all.css" rel="stylesheet"
+    /> 
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/packages/charts/classic/charts.js"></script>
+   
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/resources/theme-neptune-all.css" rel="stylesheet"
+    />-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/classic/theme-neptune/resources/theme-neptune-all.css" rel="stylesheet"
+    />
+
+    <script type="text/javascript" src="./js/ext-all-debug.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/packages/charts/classic/charts.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.2.0/packages/charts/classic/neptune/resources/charts-all.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
+    <script type="text/javascript" src="./js/util.js"></script>
+    <script type="text/javascript" src="./js/eventbus.js"></script>
+    <script type="text/javascript" src="./js/mqtt.js"></script>
+<!--    <script type="text/javascript" src="./js/mqttConnectPanel.js"></script>
+    <script type="text/javascript" src="./js/mqttPanel.js"></script>
+    <script type="text/javascript" src="./js/mqttGridPanel.js"></script>
+    <script type="text/javascript" src="./js/mqttLineChartPanel.js"></script>
+    <script type="text/javascript" src="./js/mqttRealTimePanel.js"></script> -->
+    <script type="text/javascript">
+        eb = Minibus.create();
+        eb.on(".*", function (arg) {
+            log('EB => ' + JSON.stringify(arg));
+        })
+        eb.emit("test eb");
+        eb.onLocal("mqtt/connected", (e) => log("=== CONNECTED =====" + JSON.stringify(e) + "================="));
+        myMqtt = new MyMqtt("limero.ddns.net", 1884); // was 1884
+        Ext.require([
+                'widget.cartesian',
+                'Limero.mqtt.MqttGridPanel',
+                'Limero.mqtt.MqttRealTimePanel',
+                'Limero.mqtt.MqttLineChartPanel',
+                "Limero.mqtt.MqttConnectPanel",
+                'Limero.app.Application'
+                ]);
+
+        Ext.onReady(function () {
+            Ext.create('Limero.app.Application',{
+
+            });
+
+            Ext.create("Limero.mqtt.MqttConnectPanel", {
+                renderTo: "mqttConnect"
+            });
+            Ext.define('MqttView', {
+                extend: 'Ext.Panel',
+                x: 0,
+                y: 0,
+                height: 100,
+                width: 200,
+                title: 'Hello world',
+                html: 'First Ext JS Hello World Program',
+                resizable: true,
+                draggable: true
+            });
+            Ext.create('MqttView', {
+                renderTo: 'valueMqttView'
+            });
+
+        });
+    </script>
+</head>
+
+<body>
+    <div id="helloWorldPanel"></div>
+    <div id="mqttConnect"></div>
+    <div id="mqttPanel"></div>
+    <div id="valueMqttView"></div>
+    <div id="log">
+        <div>
+</body>
+
+</html>

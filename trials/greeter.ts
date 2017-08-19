@@ -1,0 +1,3 @@
+function greeter() {
+    return "Hi"
+}

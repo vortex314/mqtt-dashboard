@@ -1,0 +1,168 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/polymer/0.5.6/polymer.js"></script>-->
+  <script src="https://code.jquery.com/jquery-3.2.1.js" integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE=" crossorigin="anonymous"></script>
+  <script>
+    clicker = function () {
+      $("#thegrid").append('<div class="tile" col="3" row="3" height="1" width="1" style="touch-action: none;"><span resize="top-right">┐</span></div>');
+      console.log('added');
+    };
+  </script>
+  <script src="./bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="bower_components/mqtt-connection/mqtt-connection.html">
+  <link rel="import" href="bower_components/mqtt-wrapper/mqtt-wrapper.html">
+  <link rel="import" href="bower_components/paper-styles/color.html">
+  <link rel="import" href="bower_components/iron-demo-helpers/demo-snippet.html">
+  <link rel="import" href="bower_components/iron-demo-helpers/demo-pages-shared-styles.html">
+  <link rel="import" href="bower_components/paper-styles/color.html">
+  <link rel="import" href="bower_components/paper-progress/paper-progress.html">
+  <link rel="import" href="bower_components/paper-button/paper-button.html">
+  <link rel="import" href="bower_components/paper-menu/paper-menu.html">
+  <link rel="import" href="bower_components/paper-datatable/paper-datatable.html">
+  <link rel="import" href="bower_components/paper-item/paper-item.html">
+  <link rel="import" href="bower_components/paper-toggle-button/paper-toggle-button.html">
+  <link rel="import" href="bower_components/paper-slider/paper-slider.html">
+  <link rel="import" href="bower_components/the-grid/the-grid.html">
+  <link rel="import" href="bower_components/l2t-context-menu/l2t-context-menu.html">
+
+  <title>poly-element</title>
+
+</head>
+
+<body>
+  <style>
+    the-grid>div {
+      background: black;
+      opacity: 0.9;
+      color: white;
+      cursor: move;
+      overflow: hidden;
+    }
+
+    the-grid>div[placeholder] {
+      background: #afafaf;
+    }
+
+    the-grid [resize] {
+      position: absolute;
+    }
+
+    the-grid [resize="bottom-right"] {
+      bottom: 0;
+      right: 0;
+      cursor: nwse-resize;
+    }
+
+    the-grid [resize="bottom-left"] {
+      bottom: 0;
+      left: 0;
+      cursor: nesw-resize;
+    }
+
+    the-grid [resize="top-right"] {
+      top: 0;
+      right: 0;
+      cursor: nesw-resize;
+    }
+
+    the-grid [resize="top-left"] {
+      top: 0;
+      left: 0;
+      cursor: nwse-resize;
+    }
+
+    the-grid [resize="left"] {
+      top: 50%;
+      left: 0;
+      cursor: ew-resize;
+      margin-top: -10px;
+    }
+
+    the-grid [resize="top"] {
+      top: 0%;
+      width: 100%;
+      text-align: center;
+      cursor: ns-resize;
+    }
+
+    the-grid [resize="right"] {
+      top: 50%;
+      right: 0;
+      cursor: ew-resize;
+      margin-top: -10px;
+    }
+
+    the-grid [resize="bottom"] {
+      bottom: 0;
+      width: 100%;
+      text-align: center;
+      cursor: ns-resize;
+    }
+
+    paper-button.indigo {
+      background-color: var(--paper-indigo-500);
+      color: white;
+      --paper-button-raised-keyboard-focus: {
+        background-color: var(--paper-pink-a200) !important;
+        color: white !important;
+      }
+      ;
+    }
+  </style>
+  <mqtt-connection host="limero.ddns.net" port="1884"></mqtt-connection>
+  <the-grid id="thegrid" draggable resizable animated col-count="14" row-count="4" cell-margin="1" cell-height="30">
+    <div class="tile" col="0" row="0" height="1" width="4">
+      <span resize="top-right">┐</span>
+      <mqtt-wrapper sub='[{"topic":"src/+/system/+","content":"html"}]'>
+        <h4>
+          <div></div>
+        </h4>
+      </mqtt-wrapper>
+
+    </div>
+    <div class="tile" col="0" row="1" height="1" width="4">
+      <span resize="top-right">┐</span>
+      <mqtt-wrapper sub='[{"topic":"src/+/system/cpu","content":"html"}]'>
+        <h4>
+          <div></div>
+        </h4>
+      </mqtt-wrapper>
+    </div>
+
+    <div class="tile" col="4" row="3" height="1" width="1">
+      <span resize="top-right">┐</span>
+      <lt2-context-menu></lt2-context-menu>
+    </div>
+
+    <div class="tile" col="4" row="0" height="2" width="2">
+      <span resize="bottom-left">└</span>
+      <mqtt-wrapper pub='[{"event":"down up","topic":"dst/ESP123/SERV123/option","attribute":"pressed"}]'>
+        <paper-button class="indigo" onclick="clicker()">Test</paper-button>
+      </mqtt-wrapper>
+    </div>
+    <div class="tile" col="2" row="2" height="2" width="2">
+      <span resize="left">│</span>
+      <span resize="right">│</span>
+      <span resize="top">─</span>
+      <span resize="bottom">─</span>
+      <span resize="top-right">┐</span>
+      <span resize="top-left">┌</span>
+      <span resize="bottom-right">┘</span>
+      <span resize="bottom-left">└</span>
+    </div>
+    <div placeholder></div>
+  </the-grid>
+
+
+
+
+
+
+
+</body>
+
+
+</html>
