@@ -1,4 +1,4 @@
-angular.module('mqtt-dashboard')
+angular.module('plunker.services', [])
     .factory('DataService', function () {
         return {
             lineChart: {
