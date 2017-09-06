@@ -17,7 +17,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.1/nv.d3.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-nvd3/1.0.5/angular-nvd3.min.js"></script>
 
-  <link rel="stylesheet" href="https://raw.githack.com/ManifestWebDesign/angular-gridster/v0.13.5/dist/angular-gridster.min.css" />
+  <link rel="stylesheet" href="https://raw.githack.com/ManifestWebDesign/angular-gridster/v0.13.5/dist/angular-gridster.min.css"
+  />
   <script src="https://raw.githack.com/ManifestWebDesign/angular-gridster/v0.13.5/dist/angular-gridster.min.js"></script>
 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
@@ -26,16 +27,20 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-grid/4.0.6/ui-grid.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-grid/4.0.6/ui-grid.css" />
 
-  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-
-
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+    crossorigin="anonymous">
   <script src="main/MainCtrl.js"></script>
-  <script src="mqtt/MqttCtrl.js"></script>
+
   <script src="js/dataService.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
   <script src="js/eventbus.js"></script>
   <script src="mqtt/mqtt.js"></script>
+  <script src="mqtt/MqttCtrl.js"></script>
+  <script src="mqtt/MqttStateCtrl.js"></script>
   <script src="js/util.js"></script>
+  <script src="js/defaultConfig.js"></script>
+  <script src="widgets/widgetBodyDir.js"></script>
+  <script src="widgets/widgetContentDir.js"></script>
   <style>
     .grid {
       width: "100%";
@@ -71,28 +76,23 @@
     <p class="col-md-6">{{ebMessage}}</p>
   </div>
   <div id="dataGrid" ui-grid="gridOptions" class="grid"></div>
-  <!--div gridster="gridsterOptions">
+
+  <div gridster="gridsterOptions">
     <ul class="with-3d-shadow with-transitions">
       <li gridster-item="widget" ng-repeat="widget in dashboard.widgets">
+        <!--widget-body widget="widget" data="widget.chart.data" api="widget.chart.api" config="config" events="events" options="widget.chart.options"></widget-body-->
         <div class="box">
           <div class="box-header">
-            <strong>{{ widget.name }}</strong>
+            <h3>{{ widget.name }}</h3>
             <div class="box-header-btns pull-right">
               <a title="settings" ng-click="settingsWidget(widget)"><i class="glyphicon glyphicon-cog"></i></a>
               <a title="Remove widget" ng-click="removeWidget(widget)"><i class="glyphicon glyphicon-trash"></i></a>
             </div>
           </div>
-          <div class="box-content">
-            <nvd3 options="widget.chart.options" data="widget.chart.data" api="widget.chart.api" config="config" events="events"></nvd3>
+          <div class="box-content" ng-controller="MqttCtrl" right-click="clear()" ng-context-menu="clear()" oncontextmenu="clear();return false;">
+            <widget-content></widget-content>
           </div>
         </div>
-      </li>
-    </ul>
-  </div-->
-  <div gridster="gridsterOptions2">
-    <ul class="with-3d-shadow with-transitions">
-      <li gridster-item="widget" ng-repeat="widget in dashboard2.widgets">
-        <widget-body widget="widget" data="widget.chart.data" api="widget.chart.api" config="config" events="events" options="widget.chart.options"></widget-body>
       </li>
     </ul>
   </div>

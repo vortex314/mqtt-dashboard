@@ -1,10 +1,10 @@
 var app = angular.module('mqtt-dashboard');
 
-app.controller('MqttCtrl', function ($scope, $timeout, $uibModal) {
+app.controller('MqttStateCtrl', function ($scope, $timeout, $uibModal) {
   // We want to hide the charts until the grid will be created and all widths and heights will be defined.
   // So that use `visible` property in config attribute
-  $scope.mqttSubscribe = "src/+/system/alive";
-  $scope.topicRegexps = ["src/.*/system/alive"];
+  $scope.topic = "src/+/system/alive";
+  $scope.topicRegexp = $scope.topic.replace("+", ".*");
   $scope.records = [];
   $scope.config = {
     visible: false
@@ -21,11 +21,9 @@ app.controller('MqttCtrl', function ($scope, $timeout, $uibModal) {
     console.log('clearing in widget');
   }
 
-  //TODO calculate regexps from mqttSubscribes
-
-
-  $scope.topicRegexps.forEach(function (topic, idx, ref) {
-    eb.on(topic, function (ev) {
+  $scope.start = function () {
+    $scope.mqtt.subscribe($scope.topic);
+    eb.on($scope.topicRegexp, function (ev) {
       if (hasField(ev, "topic")) {
         log(JSON.stringify(ev));
 
@@ -59,5 +57,9 @@ app.controller('MqttCtrl', function ($scope, $timeout, $uibModal) {
         }
       };
     });
-  });
+  };
+
+  //TODO calculate regexps from mqttSubscribes
+
+
 });
