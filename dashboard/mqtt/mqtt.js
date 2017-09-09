@@ -15,7 +15,19 @@ class MyMqtt {
         this.connected = false;
         this.topics = [];
         this.topics.push(this.topicFilter);
+        this.lwt = {};
+        this.lwt.topic = "src/" + this.name + "/system/alive";
+        this.lwt.message = "false";
         MyMqtt.instance = this;
+    }
+
+    getConfig() {
+        return {
+            host: this.host,
+            port: this.port,
+            tls: this.use_TLS,
+            topics: this.topics
+        }
     }
     //=======================================================================
     onConnected() {
@@ -25,12 +37,16 @@ class MyMqtt {
         log("Subscribe to topic : " + this.topicFilter);
         var i;
         for (i = 0; i < this.topics.length; i++)
-            this.mqtt.subscribe(this.topics[i],{  qos: 0 });
-        this.publish("src/" + this.name + "/alive", true);
+            this.mqtt.subscribe(this.topics[i], { qos: 0 });
+        this.publish(this.lwt.topic, true);
     }
     //=======================================================================
     connect() {
         this.mqtt = new Paho.MQTT.Client(this.host, this.port, this.path, this.name);
+        var willMsg = new Paho.MQTT.Message(this.lwt.message);
+        willMsg.destinationName = this.lwt.topic;
+        willMsg.qos = 0;
+        willMsg.retained = false;
         var options = {
             timeout: 3,
             useSSL: this.use_TLS,
@@ -39,16 +55,17 @@ class MyMqtt {
             onFailure: function (message) {
                 warn("Connection failed: " + message.errorMessage + "Retrying");
                 setTimeout(this.connect, this.reconnect_timeout);
-            }
+            },
+            willMessage: willMsg,
+            keepAliveInterval: 10
         };
         this.mqtt.onConnectionLost = (resp) => this.onConnectionLost(resp);
         this.mqtt.onMessageArrived = (message) => this.onMessageArrived(message);
+        this.mqtt.keepAliveInterval = 20;
         log("Connecting Host=" + this.host + ", port=" + this.port + ", path=" + this.path + " as source " + this.name + " ...");
-        var willMsg = new Paho.MQTT.Message("false");
-        willMsg.destinationName = "src/" + this.src + "/alive";
-        var lastWillOption = { willMessage: willMsg };
+
         try {
-            this.mqtt.connect(options, lastWillOption);
+            this.mqtt.connect(options);
         } catch (error) {
             log(' mqtt connect failed ' + error);
         }
@@ -57,9 +74,9 @@ class MyMqtt {
     }
     //=======================================================================
     disconnect() {
-      log("mqtt disconnect");
+        log("mqtt disconnect");
         this.autoReconnect = false;
-        this.connected=false;
+        this.connected = false;
         this.mqtt.disconnect();
     }
 
@@ -68,16 +85,18 @@ class MyMqtt {
         eb.emitLocal("mqtt/disconnected");
         this.connected = false;
         if (this.autoReconnect)
-            setTimeout(function() {
-              this.connect();
+            setTimeout(function () {
+                this.connect();
             }, this.reconnect_timeout);
         log("connection lost: " + response.errorMessage + ". Reconnecting :" + this.autoReconnect);
     }
     //=======================================================================
-    publish(topic, data) {
+    publish(topic, data, qos = 0, retained = false) {
         var message = JSON.stringify(data);
         var msg = new Paho.MQTT.Message(message);
         msg.destinationName = topic;
+        msg.qos = qos;
+        msg.retained = retained;
         this.mqtt.send(msg);
         log("publish " + topic + " : " + message);
     }

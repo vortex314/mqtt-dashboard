@@ -1,0 +1,9 @@
+<div ng-controller="MqttStateCtrl">
+    <strong>{{config.topics}}</strong>
+    <table border="1" margin="10 10" width="100%">
+        <tr ng-repeat="record in records">
+            <td ng-style="expiredStyle(record)">{{record.topic.split("/")[1]}}</td>
+            <td>{{ msToTime(record.message) }}</td>
+        </tr>
+    </table>
+</div>

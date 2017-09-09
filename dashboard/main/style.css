@@ -3,6 +3,8 @@
     height: 100%;
     /* border: 1px solid #ccc; */
     background-color: #fff;
+    overflow:hidden;
+    white-space:wrap;
 }
 .box-header {
     height: 30px;
@@ -23,8 +25,7 @@
 .box-content {
     height: 100%;
     padding: 0px;
-    overflow:hidden;
-    white-space:wrap;
+    
 }
 .box-header-btns {
     top: 15px;

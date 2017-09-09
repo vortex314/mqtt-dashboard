@@ -1,4 +1,4 @@
-var app = angular.module('mqtt-dashboard', ['nvd3', 'gridster', 'plunker.services', 'ui.bootstrap', 'ui.grid', 'ui.grid.resizeColumns', 'ngSanitize']);
+var app = angular.module('mqtt-dashboard', ['oc.lazyLoad', 'nvd3', 'gridster', 'plunker.services', 'ui.bootstrap', 'ui.grid', 'ui.grid.resizeColumns', 'ngSanitize']);
 
 app.controller('MainCtrl', function ($scope, $timeout, DataService, $uibModal) {
 
@@ -18,43 +18,13 @@ app.controller('MainCtrl', function ($scope, $timeout, DataService, $uibModal) {
 
       // optional callback fired when item is resized,
       resize: function (event, $element, widget) {
-        if (widget.chart.api) widget.chart.api.update();
+        if (widget.context.api.update) widget.context.api.update();
       },
 
       // optional callback fired when item is finished resizing
       stop: function (event, $element, widget) {
         $timeout(function () {
-          if (widget.chart.api) widget.chart.api.update();
-        }, 400)
-      }
-    },
-  };
-
-
-
-  $scope.gridsterOptions = {
-    margins: [1, 1],
-    columns: 10,
-    mobileModeEnabled: false,
-    draggable: {
-      handle: 'h3'
-    },
-    resizable: {
-      enabled: true,
-      handles: ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
-
-      // optional callback fired when resize is started
-      start: function (event, $element, widget) { },
-
-      // optional callback fired when item is resized,
-      resize: function (event, $element, widget) {
-        if (widget.chart.api) widget.chart.api.update();
-      },
-
-      // optional callback fired when item is finished resizing
-      stop: function (event, $element, widget) {
-        $timeout(function () {
-          if (widget.chart.api) widget.chart.api.update();
+          if (widget.context.api.update) widget.context.api.update();
         }, 400)
       }
     },
@@ -66,11 +36,11 @@ app.controller('MainCtrl', function ($scope, $timeout, DataService, $uibModal) {
       row: 0,
       sizeY: 2,
       sizeX: 2,
-      name: "Discrete Bar Chart",
-      template: '<nvd3 options="widget.chart.options" data="widget.chart.data" api="widget.chart.api" config="config" events="events"></nvd3>',
-      chart: {
-        options: DataService.discreteBarChart.options(),
-        data: DataService.discreteBarChart.data(),
+      context: {
+        html: 'alive.html',
+        ctrl: '',
+        topics: 'src/+/system/alive',
+        mqttController: 'MqttStateCtrl',
         api: {}
       }
     }, {
@@ -78,11 +48,11 @@ app.controller('MainCtrl', function ($scope, $timeout, DataService, $uibModal) {
       row: 0,
       sizeY: 2,
       sizeX: 2,
-      name: "Candlestick Bar Chart",
-      template: '<nvd3 options="widget.chart.options" data="widget.chart.data" api="widget.chart.api" config="config" events="events"></nvd3>',
-      chart: {
-        options: DataService.candlestickBarChart.options(),
-        data: DataService.candlestickBarChart.data(),
+      context: {
+        html: 'widgetLineChart.html',
+        ctrl: 'widgetLineChartCtrl.js',
+        topics: '$SYS/broker/load/messages/received/#',
+        mqttController: 'MqttHistoryCtrl',
         api: {}
       }
     }, {
@@ -90,11 +60,11 @@ app.controller('MainCtrl', function ($scope, $timeout, DataService, $uibModal) {
       row: 2,
       sizeY: 2,
       sizeX: 3,
-      name: "Line Chart",
-      template: '<nvd3 options="widget.chart.options" data="widget.chart.data" api="widget.chart.api" config="config" events="events"></nvd3>',
-      chart: {
-        options: DataService.lineChart.options(),
-        data: DataService.lineChart.data(),
+      context: {
+        html: 'widgetLineChart.html',
+        ctrl: 'widgetLineChartCtrl.js',
+        topics: '$SYS/broker/load/messages/received/1min',
+        mqttController: '',
         api: {}
       }
     }, {
@@ -102,11 +72,11 @@ app.controller('MainCtrl', function ($scope, $timeout, DataService, $uibModal) {
       row: 2,
       sizeY: 1,
       sizeX: 1,
-      name: "Pie Chart",
-      template: '<nvd3 options="widget.chart.options" data="widget.chart.data" api="widget.chart.api" config="config" events="events"></nvd3>',
-      chart: {
-        options: DataService.pieChart.options(),
-        data: DataService.pieChart.data(),
+      context: {
+        html: 'textarea.html',
+        ctrl: '',
+        topics: 'src/dashboards/test/#',
+        mqttController: 'MqttStateCtrl',
         api: {}
       }
     }, {
@@ -114,11 +84,11 @@ app.controller('MainCtrl', function ($scope, $timeout, DataService, $uibModal) {
       row: 2,
       sizeY: 1,
       sizeX: 1,
-      name: "MQTT",
-      template: '<ul ng-controller="MqttCtrl"><li ng-repeat="record in topicRecords">{{record.topic}}:{{record.message}}</li></ul>',
-      chart: {
-        options: DataService.pieChart.options(),
-        data: DataService.pieChart.data(),
+      context: {
+        html: 'text.html',
+        ctrl: '',
+        topics: 'src/+/system/upTime',
+        mqttController: 'MqttStateCtrl',
         api: {}
       }
     }]
@@ -130,11 +100,11 @@ app.controller('MainCtrl', function ($scope, $timeout, DataService, $uibModal) {
       row: 2,
       sizeY: 1,
       sizeX: 1,
-      name: "Pie Chart",
-      template: '<nvd3 options="widget.chart.options" data="widget.chart.data" api="widget.chart.api" config="config" events="events"></nvd3>',
-      chart: {
-        options: DataService.pieChart.options(),
-        data: DataService.pieChart.data(),
+      context: {
+        html: 'grid.html',
+        ctrl: 'gridCtrl.js',
+        topics: 'src/+/system/alive',
+        mqttController: 'MqttStateCtrl',
         api: {}
       }
     });
@@ -159,9 +129,13 @@ app.controller('MainCtrl', function ($scope, $timeout, DataService, $uibModal) {
 
   $scope.saveLayout = function () {
     log("saving layout ... ");
-    log(JSON.stringify($scope.dashboard.widgets));
+    var config = $scope.mqtt.getConfig();
+    config.layout = $scope.dashboard;
+    config.updated = new Date();
+    log(JSON.stringify(config));
+    $scope.mqtt.publish("src/dashboards/test/1", JSON.stringify(config), 1, true);
   }
-
+  //=================================================================================
   $scope.clear = function () {
     $scope.mqttData.length = 0;
   }
@@ -218,7 +192,7 @@ app.controller('MainCtrl', function ($scope, $timeout, DataService, $uibModal) {
       this.$apply(fn);
     }
   };
-  // ================================= MQTT PART
+  // ================================= MQTT connection PART
 
   $scope.mqttHostPorts = ["limero.ddns.net:1884", "test.mosquitto.org:8080"];
   $scope.mqttHostPort = "limero.ddns.net:1884";
@@ -234,7 +208,7 @@ app.controller('MainCtrl', function ($scope, $timeout, DataService, $uibModal) {
     $scope.mqtt.port = Number($scope.mqttHostPort.split(':')[1]);
     $scope.mqtt.connect();
     //    $scope.mqtt.subscribe("#");
-    $scope.mqtt.subscribe("$SYS/broker/uptime");
+    //   $scope.mqtt.subscribe("$SYS/broker/uptime");
   };
   $scope.mqttDisconnect = function () {
     $scope.mqtt.disconnect();
@@ -250,77 +224,9 @@ app.controller('MainCtrl', function ($scope, $timeout, DataService, $uibModal) {
       $scope.mqttConnect();
     }
   }
-  $scope.mqttData = [];
-
-  $scope.mqttTopicFind = function (record) {
-    return record.topic === String(this); // this is an array of char ?
-  }
-
-  $scope.mqttSubscriptionsClear = function () {
-    $scope.mqtt.topics = [];
-  }
-  eb.on(".*", function (ev) {
-    if (hasField(ev, "topic")) {
-      var index = $scope.mqttData.findIndex(function (record) {
-        return record.topic === String(this);
-      }, ev.topic);
-      if (index > -1) {
-        var record = $scope.mqttData[index];
-        record.count++;
-        record.message = ev.message;
-        record.time = new Date().toLocaleTimeString();
-      } else {
-        try {
-          var t = typeof JSON.parse(ev.message);
-        } catch (exception) {
-          log(" JSON parse exception on -- " + ev.message);
-          t = "string";
-        }
-        $scope.mqttData.push({
-          "topic": ev.topic,
-          "message": ev.message,
-          "time": new Date().toLocaleTimeString(),
-          "count": 1,
-          "type": t
-        });
-      }
-    }
-  });
-
-  $scope.gridOptions = {
-    enableColumnResizing: true,
-    enableFiltering: true,
-    onRegisterApi: function (gridApi) {
-      $scope.gridApi = gridApi;
-    },
-    data: $scope.mqttData
-  };
-
-  $scope.highlightFilteredHeader = function (row, rowRenderIndex, col, colRenderIndex) {
-    if (col.filters[0].term) {
-      return 'header-filtered';
-    } else {
-      return '';
-    }
-  };
-
-  $scope.gridOptions.columnDefs = [{
-    name: 'topic',
-    headerCellClass: $scope.highlightFilteredHeader
-  }, {
-    name: 'message'
-  }, {
-    name: 'time'
-  }, {
-    name: 'count'
-  }, {
-    name: 'type',
-    cellTemplate: '<div ><span class="glyphicon glyphicon-fonts"></span><span ng-click="saveLayout()" ng-show="COL_FIELD === \'number\'" class="glyphicon glyphicon-stats"></span>{{COL_FIELD}}</div>'
-  }];
 
   setTimeout(function () {
     $scope.mqtt.connect();
-    $scope.mqtt.subscribe("#");
   }, 1000);
 
 });

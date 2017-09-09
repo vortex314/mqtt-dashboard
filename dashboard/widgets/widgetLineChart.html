@@ -1,0 +1,7 @@
+<div ng-controller="WidgetLineChartCtrl">
+    <nvd3 style="height:100%;" options="options" data="data" api="context.api" config="config" events="events">
+    </nvd3>
+    <H1>!REFRESH</H1>
+    <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="context.api.refresh()">Refresh</button>
+
+</div>

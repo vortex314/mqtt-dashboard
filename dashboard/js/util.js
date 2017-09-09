@@ -24,6 +24,8 @@ function timeString() {
     return t;
 }
 
+
+
 function log_stack() {
     var stack = new Error().stack;
     console.log("PRINTING CALL STACK");
@@ -36,7 +38,7 @@ function log(s) {
 }
 
 function warn(s) {
-    console.log("W " + timeString() + " | " + s);
+    console.error("W " + timeString() + " | " + s);
     //    $('#log').html(new Date() + " | " + s);
 }
 

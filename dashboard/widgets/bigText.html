@@ -1,0 +1,15 @@
+<div ng-controller="MqttStateCtrl">
+    <strong>{{config.topics}}</strong>
+    <div>{{config}}</div>
+    <div>{{config}}</div>
+    <table border="1" margin="10 10" width="100%">
+        <tr ng-repeat="record in records">
+            <td ng-if="record.message" align="center" style="background-color:green;color:white;">
+                <h1>{{record.message}}</h1>
+            </td>
+            <td ng-if="!record.message" align="center" style="background-color:red;color:white;">
+                <h1>{{record.message}}</h1>
+            </td>
+        </tr>
+    </table>
+</div>

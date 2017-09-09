@@ -7,6 +7,8 @@
   <script>
     document.write('<base href="' + document.location + '" />');
   </script>
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+    crossorigin="anonymous"></script>
   <link rel="stylesheet" href="main/style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.1/nv.d3.min.css" />
   <!-- script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.9/angular.js"></script-->
@@ -34,17 +36,23 @@
   <script src="js/eventbus.js"></script>
   <script src="mqtt/mqtt.js"></script>
   <script src="js/dataService.js"></script>
+
+  <script src="main/ocLazyLoad.js"></script>
   <script src="main/MainCtrl.js"></script>
-  <script src="mqtt/MqttCtrl.js"></script>
+  <script src="main/widgetDirective.js"></script>
+  <!--script src="main/app.js"></script-->
+  <!--script src="mqtt/MqttCtrl.js"></script-->
   <script src="mqtt/MqttStateCtrl.js"></script>
+  <script src="mqtt/MqttHistoryCtrl.js"></script>
   <script src="js/util.js"></script>
   <script src="js/defaultConfig.js"></script>
-  <script src="widgets/widgetBodyDir.js"></script>
-  <script src="widgets/widgetContentDir.js"></script>
+  <script src="widgets/gridCtrl.js"></script>
+  <!--script src="widgets/widgetContentDir.js"></script-->
+
   <style>
     .grid {
       width: "100%";
-      height: 250px;
+      height: 300px;
     }
 
     .header-filtered {
@@ -53,51 +61,46 @@
   </style>
 </head>
 
-<body ng-controller="MainCtrl">
-  <form name="mqttConnection" class "form-horizontal">
-    <div class="form-group form-group-xs">
-      <label class="col-md-1 control-label">MQTT Host:Port</label>
-      <div class="col-md-2 selectContainer">
-        <select class="form-control" ng-model="mqttHostPort" ng-change="mqttConnectionChange()" name="hostPort">
+<body>
+  <div ng-controller="MainCtrl">
+    <form name="mqttConnection" class "form-horizontal">
+      <div class="form-group form-group-xs">
+        <label class="col-md-1 control-label">MQTT Host:Port</label>
+        <div class="col-md-2 selectContainer">
+          <select class="form-control" ng-model="mqttHostPort" ng-change="mqttConnectionChange()" name="hostPort">
                 <option ng-repeat="hostPort in mqttHostPorts" value="{{hostPort}}">{{hostPort}}</option>
         </select>
-      </div>
-      <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="mqttConnectHandle()">{{mqtt.connected?"Disconnect":"Connect"}}</button>
-      <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="mqtt.subscribe('$SYS/#')" ng-disabled="!mqtt.connected">Subscribe $SYS/#</button>
-      <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="mqtt.subscribe('#')" ng-disabled="!mqtt.connected">Subscribe #</button>
-      <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="mqttSubscriptionsClear()" ng-disabled="mqtt.connected">Clear subscriptions</button>
-      <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="addWidget()">Add Widget</button>
-      <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="saveLayout()"><span class="glyphicon glyphicon-floppy-disk"></span></button>
-      <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="clear()">Clear Table</span></button>
-
-    </div>
-  </form>
-  <div class="row">
-    <p class="col-md-6">{{ebMessage}}</p>
-  </div>
-  <div id="dataGrid" ui-grid="gridOptions" class="grid"></div>
-
-  <div gridster="gridsterOptions">
-    <ul class="with-3d-shadow with-transitions">
-      <li gridster-item="widget" ng-repeat="widget in dashboard.widgets">
-        <!--widget-body widget="widget" data="widget.chart.data" api="widget.chart.api" config="config" events="events" options="widget.chart.options"></widget-body-->
-        <div class="box">
-          <div class="box-header">
-            <h3>{{ widget.name }}</h3>
-            <div class="box-header-btns pull-right">
-              <a title="settings" ng-click="settingsWidget(widget)"><i class="glyphicon glyphicon-cog"></i></a>
-              <a title="Remove widget" ng-click="removeWidget(widget)"><i class="glyphicon glyphicon-trash"></i></a>
-            </div>
-          </div>
-          <div class="box-content" ng-controller="MqttCtrl" right-click="clear()" ng-context-menu="clear()" oncontextmenu="clear();return false;">
-            <widget-content></widget-content>
-          </div>
         </div>
-      </li>
-    </ul>
-  </div>
+        <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="mqttConnectHandle()">{{mqtt.connected?"Disconnect":"Connect"}}</button>
+        <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="mqtt.subscribe('$SYS/#')" ng-disabled="!mqtt.connected">Subscribe $SYS/#</button>
+        <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="mqtt.subscribe('#')" ng-disabled="!mqtt.connected">Subscribe #</button>
+        <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="mqttSubscriptionsClear()" ng-disabled="mqtt.connected">Clear subscriptions</button>
+        <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="addWidget()">Add Widget</button>
+        <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="saveLayout()">Save Layout <span class="glyphicon glyphicon-floppy-disk"></span></button>
+        <div>{{mqtt.name}}</div>
+      </div>
+    </form>
+    <div class="row">
+      <p class="col-md-6">{{ebMessage}}</p>
+    </div>
 
-  <br><a href="http://krispo.github.io/angular-nvd3/" target="_blank" style="float: right;">See more</a>
+    <div ng-controller="MqttStateCtrl" ng-init='context={};context.topics="#";start();'>
+      <div ng-controller="gridCtrl">
+        <div id="dataGrid" ui-grid="gridOptions" class="grid">
+        </div>
+      </div>
+    </div>
+
+    <div gridster="gridsterOptions">
+      <ul class="with-3d-shadow with-transitions">
+        <li class="box" gridster-item="widget" ng-repeat="widget in dashboard.widgets">
+          <widget context="widget.context" mqtt="mqtt" style="overflow:hidden;">
+          </widget>
+        </li>
+      </ul>
+    </div>
+    <br><a href="http://krispo.github.io/angular-nvd3/" target="_blank" style="float: right;">See more</a>
+  </div>
 </body>
 
 </html>
