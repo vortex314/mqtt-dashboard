@@ -4,7 +4,7 @@ app.controller('MainCtrl', function ($scope, $timeout, DataService, $uibModal) {
 
   $scope.gridsterOptions = {
     margins: [1, 1],
-    columns: 10,
+    columns: 12,
     mobileModeEnabled: false,
     draggable: {
       handle: 'h3'

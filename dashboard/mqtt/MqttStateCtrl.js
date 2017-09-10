@@ -60,6 +60,12 @@ mqttStateCtrl = function ($scope, $timeout, $uibModal) {
                 "type": t
               });
           };
+          index = $scope.records.findIndex(function (element) {
+            return element.time < (new Date() - 60000);
+          }, this);
+          if (index > -1) {
+            $scope.records.splice(index, 1);
+          }
           $scope.safeApply();
         }
       };

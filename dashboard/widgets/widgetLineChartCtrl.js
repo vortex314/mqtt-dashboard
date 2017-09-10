@@ -3,7 +3,6 @@ var app = angular.module('mqtt-dashboard');
 app.controller('WidgetLineChartCtrl',
     function ($scope, $timeout, $uibModal) {
 
-        $scope.config = {};
 
         $scope.safeApply = function (fn) {
             var phase = this.$root.$$phase;
@@ -36,14 +35,6 @@ app.controller('WidgetLineChartCtrl',
         $timeout(function () {
             $scope.config.visible = true;
         }, 200);
-
-        $scope.getConfig = function (key, defaultValue) {
-            if (!$scope.config[key]) {
-                $scope.config[key] = defaultValue;
-                return defaultValue;
-            }
-            return $scope.config[key];
-        }
 
         $scope.options = {
             chart: {
@@ -86,7 +77,7 @@ app.controller('WidgetLineChartCtrl',
             if (index < 0) {
                 $scope.data.push({
                     key: key,
-                    area: true,
+                    //                    area: true,
                     values: [{ x: time, y: value }]
                 })
             } else {
