@@ -66,7 +66,7 @@ mqttStateCtrl = function ($scope, $timeout, $uibModal) {
           if (index > -1) {
             $scope.records.splice(index, 1);
           }
-          $scope.safeApply();
+          //          $scope.safeApply();
         }
       };
     });

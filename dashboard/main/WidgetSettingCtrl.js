@@ -1,5 +1,7 @@
-.controller('WidgetSettingsCtrl', ['$scope', '$timeout', '$rootScope', '$modalInstance', 'widget',
-	function($scope, $timeout, $rootScope, $modalInstance, widget) {
+var app = angular.module('mqtt-dashboard');
+
+app.controller('WidgetSettingsCtrl', ['$scope', '$timeout', '$rootScope', '$uibModalInstance', 'widget',
+	function ($scope, $timeout, $rootScope, $uibModalInstance, widget) {
 		$scope.widget = widget;
 
 		$scope.form = {
@@ -24,18 +26,18 @@
 			name: '4'
 		}];
 
-		$scope.dismiss = function() {
+		$scope.dismiss = function () {
 			$modalInstance.dismiss();
 		};
 
 
 
-		$scope.remove = function() {
+		$scope.remove = function () {
 			$scope.dashboard.widgets.splice($scope.dashboard.widgets.indexOf(widget), 1);
 			$modalInstance.close();
 		};
 
-		$scope.submit = function() {
+		$scope.submit = function () {
 			angular.extend(widget, $scope.form);
 
 			$modalInstance.close(widget);
@@ -44,13 +46,13 @@
 	}
 ])
 
-// helper code
-.filter('object2Array', function() {
-	return function(input) {
-		var out = [];
-		for (i in input) {
-			out.push(input[i]);
+	// helper code
+	.filter('object2Array', function () {
+		return function (input) {
+			var out = [];
+			for (i in input) {
+				out.push(input[i]);
+			}
+			return out;
 		}
-		return out;
-	}
-});
+	});

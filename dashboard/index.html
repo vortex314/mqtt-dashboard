@@ -40,6 +40,7 @@
   <script src="main/ocLazyLoad.js"></script>
   <script src="main/MainCtrl.js"></script>
   <script src="main/widgetDirective.js"></script>
+  <script src="main/WidgetSettingCtrl.js"></script>
   <!--script src="main/app.js"></script-->
   <!--script src="mqtt/MqttCtrl.js"></script-->
   <script src="mqtt/MqttStateCtrl.js"></script>
@@ -94,8 +95,17 @@
     <div gridster="gridsterOptions">
       <ul class="with-3d-shadow with-transitions">
         <li class="box" gridster-item="widget" ng-repeat="widget in dashboard.widgets">
-          <widget context="widget.context" mqtt="mqtt" style="overflow:hidden;">
-          </widget>
+          <div class="box-header">
+            <strong>{{widget.context.topics}}</strong>
+            <div class="box-header-btns pull-right">
+              <a title="settings" ng-click="settingsWidget(widget)"><i class="glyphicon glyphicon-cog"></i></a>
+              <a title="Remove widget" ng-click="removeWidget(widget)"><i class="glyphicon glyphicon-trash"></i></a>
+            </div>
+          </div>
+          <div class="box-content">
+            <widget context="widget.context" mqtt="mqtt" style="overflow:hidden;">
+            </widget>
+          </div>
         </li>
       </ul>
     </div>

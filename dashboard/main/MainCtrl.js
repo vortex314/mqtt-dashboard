@@ -1,6 +1,6 @@
 var app = angular.module('mqtt-dashboard', ['oc.lazyLoad', 'nvd3', 'gridster', 'plunker.services', 'ui.bootstrap', 'ui.grid', 'ui.grid.resizeColumns', 'ngSanitize']);
 
-app.controller('MainCtrl', function ($scope, $timeout, DataService, $uibModal) {
+app.controller('MainCtrl', function ($scope, $timeout, $interval, DataService, $uibModal) {
 
   $scope.gridsterOptions = {
     margins: [1, 1],
@@ -117,7 +117,7 @@ app.controller('MainCtrl', function ($scope, $timeout, DataService, $uibModal) {
   $scope.settingsWidget = function (widget) {
     $uibModal.open({
       scope: $scope,
-      templateUrl: 'widget_settings.html',
+      templateUrl: '/dashboard/main/widget_settings.html',
       controller: 'WidgetSettingsCtrl',
       resolve: {
         widget: function () {
@@ -174,7 +174,7 @@ app.controller('MainCtrl', function ($scope, $timeout, DataService, $uibModal) {
   eb.on(".*", function (arg) {
     log('EB => ' + JSON.stringify(arg));
     $scope.ebMessage = JSON.stringify(arg);
-    $scope.safeApply();
+    //   $scope.safeApply();
   });
   eb.emit("test eb", {
     "event": "init"
@@ -182,6 +182,7 @@ app.controller('MainCtrl', function ($scope, $timeout, DataService, $uibModal) {
   eb.onLocal("mqtt/connected", function (e) {
     log("=== CONNECTED =====" + JSON.stringify(e) + "=================")
   });
+  //=================================================== UPDATE 
   $scope.safeApply = function (fn) {
     var phase = this.$root.$$phase;
     if (phase == '$apply' || phase == '$digest') {
@@ -192,14 +193,17 @@ app.controller('MainCtrl', function ($scope, $timeout, DataService, $uibModal) {
       this.$apply(fn);
     }
   };
+  $interval(function () {
+    $scope.safeApply();
+  }, 1000);
   // ================================= MQTT connection PART
 
-  $scope.mqttHostPorts = ["limero.ddns.net:1884", "test.mosquitto.org:8080"];
+  $scope.mqttHostPorts = ["limero.ddns.net:1884", "test.mosquitto.org:8080", "broker.mqttdashboard.com:8000", "test.mosca.io:80", "broker.hivemq.com:8000", "iot.eclipse.org:80"];
   $scope.mqttHostPort = "limero.ddns.net:1884";
   $scope.mqtt = new MyMqtt("limero.ddns.net", 1884);
 
   eb.onLocal("mqtt/.*", function (ev) {
-    $scope.safeApply();
+    //  $scope.safeApply();
   });
 
 
@@ -244,7 +248,7 @@ app.directive('ngRightClick', function ($parse) {
     });
   };
 });
-
+/*
 app.config([
   '$provide',
   function ($provide) {
@@ -265,4 +269,4 @@ app.config([
       }
     ]);
   }
-]);
+]); */

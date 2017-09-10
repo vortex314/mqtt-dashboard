@@ -9,7 +9,7 @@ class MyMqtt {
         this.port = port;
         this.clean_session = true;
         this.use_TLS = false;
-        this.path = "/mqtt";
+        this.path = "/ws";
         this.name = "browser." + parseInt(Math.random() * 1000000, 10);
         this.reconnect_timeout = 20;
         this.connected = false;
