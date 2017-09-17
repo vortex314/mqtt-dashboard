@@ -39,8 +39,8 @@ function nullLogger(s) {
 }
 
 function consoleLogger(s) {
-    var line = " I " + timeString() + " | " + s;
-    console.log(line);
+
+
     if (logFunction) logFunction(line);
 }
 
@@ -51,13 +51,16 @@ function setLogger(f) {
 }
 
 function log(s) {
-    logFunction(" I " + timeString() + " | " + s);
+    var line = " I " + timeString() + " | " + s;
+    logFunction(line);
+    console.log(line);
     //    $('#log').html(new Date() + " | " + s);
 }
 
 function warn(s) {
-    logFunction("W " + timeString() + " | " + s);
-    //    $('#log').html(new Date() + " | " + s);
+    var line = " W " + timeString() + " | " + s;
+    logFunction(line);
+    console.error(line);
 }
 
 

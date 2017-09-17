@@ -106,6 +106,8 @@ app.controller('MainCtrl', function ($scope, $http, $window, $timeout, $interval
     }]
   };
 
+  $scope.isCollapsed = false;
+
   $scope.copyObject = function (o) {
     var output, v, key;
     output = Array.isArray(o) ? [] : {};
@@ -258,15 +260,11 @@ app.controller('MainCtrl', function ($scope, $http, $window, $timeout, $interval
 
   eb.on(".*", function (arg) {
     log('EB => ' + JSON.stringify(arg));
-    //    $scope.ebMessage = JSON.stringify(arg);
-    //   $scope.safeApply();
   });
   eb.emit("test eb", {
     "event": "init"
   });
-  eb.onLocal("mqtt/connected", function (e) {
-    log("=== CONNECTED =====" + JSON.stringify(e) + "=================")
-  });
+
   //=================================================== UPDATE 
   $scope.safeApply = function (fn) {
     var phase = this.$root.$$phase;
@@ -284,7 +282,6 @@ app.controller('MainCtrl', function ($scope, $http, $window, $timeout, $interval
 
   $scope.logger = function (s) {
     $scope.ebMessage = s;
-    $scope.safeApply();
   }
 
   setLogger($scope.logger);
@@ -297,11 +294,6 @@ app.controller('MainCtrl', function ($scope, $http, $window, $timeout, $interval
   $scope.mqttHostPorts = ["limero.ddns.net:1884", "limero.ddns.net:1886", "test.mosquitto.org:8080", "broker.mqttdashboard.com:8000", "test.mosca.io:80", "broker.hivemq.com:8000", "iot.eclipse.org:80"];
   $scope.mqttHostPort = "limero.ddns.net:1886";
   $scope.mqtt = new MyMqtt("limero.ddns.net", 1886);
-
-  eb.onLocal("mqtt/.*", function (ev) {
-    //  $scope.safeApply();
-  });
-
 
   $scope.mqttConnect = function () {
     $scope.mqtt.host = $scope.mqttHostPort.split(':')[0];
@@ -330,39 +322,3 @@ app.controller('MainCtrl', function ($scope, $http, $window, $timeout, $interval
   }, 1000);
 
 });
-
-
-
-app.directive('ngRightClick', function ($parse) {
-  return function (scope, element, attrs) {
-    var fn = $parse(attrs.ngRightClick);
-    element.bind('contextmenu', function (event) {
-      scope.$apply(function () {
-        event.preventDefault();
-        fn(scope, { $event: event });
-      });
-    });
-  };
-});
-/*
-app.config([
-  '$provide',
-  function ($provide) {
-    return $provide.decorator('$rootScope', [
-      '$delegate',
-      function ($delegate) {
-        $delegate.safeApply = function (fn) {
-          var phase = $delegate.$$phase;
-          if (phase === "$apply" || phase === "$digest") {
-            if (fn && typeof fn === 'function') {
-              fn();
-            }
-          } else {
-            $delegate.$apply(fn);
-          }
-        };
-        return $delegate;
-      }
-    ]);
-  }
-]); */

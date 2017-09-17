@@ -88,11 +88,12 @@ mqttStateCtrl = function ($scope, $timeout, $uibModal) {
       return hours + ":" + minutes + ":" + seconds + "," + milliseconds;
   }
 
-  $scope.isOld = function (record) {
+  $scope.isOlder = function (record, seconds) {
     var date = new Date();
-    if ((date - record.time) > $scope.expireAfter) {
+    if ((date - record.time) > seconds) {
       return true;
     };
+    return false;
   }
 
   $scope.start();

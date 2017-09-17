@@ -102,11 +102,16 @@ app.controller('WidgetLineChartCtrl',
                         var msg;
                         try {
                             msg = JSON.parse(ev.message);
+                            if (typeof msg === "number") {
+                                $scope.pushData(new Date(), ev.topic, msg);
+                            } else {
+                                log(" data is not a number :' " + ev.message + "'")
+                            }
                         } catch (exception) {
                             log(" JSON parse exception on -- " + ev.message);
                             msg = ev.message;
                         }
-                        $scope.pushData(new Date(), ev.topic, msg);
+
 
                     }
                 }

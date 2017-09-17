@@ -73,7 +73,7 @@
         </select>
         </div>
         <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="mqttConnectHandle()">{{mqtt.connected?"Disconnect":"Connect"}}</button>
-        <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="mqtt.subscribe('$SYS/#')" ng-disabled="!mqtt.connected">Subscribe $SYS/#</button>
+        <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="isCollapsed = !isCollapsed">Collapse table</button>
         <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="mqtt.subscribe('#')" ng-disabled="!mqtt.connected">Subscribe #</button>
         <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="mqttSubscriptionsClear()" ng-disabled="mqtt.connected">Clear subscriptions</button>
         <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="addWidget()">Add Widget</button>
@@ -85,13 +85,15 @@
     <div class="row">
       <p class="col-md-6">{{ebMessage}}</p>
     </div>
-
-    <div ng-controller="MqttStateCtrl" ng-init='context={};context.topics="#";start();'>
-      <div ng-controller="gridCtrl">
-        <div id="dataGrid" ui-grid="gridOptions" class="grid">
+    <div uib-collapse="isCollapsed">
+      <div ng-controller="MqttStateCtrl" ng-init='context={};context.topics="#";start();'>
+        <div ng-controller="gridCtrl">
+          <div id="dataGrid" ui-grid="gridOptions" class="grid">
+          </div>
         </div>
       </div>
     </div>
+
 
     <div gridster="gridsterOptions">
       <ul class="with-3d-shadow with-transitions">
