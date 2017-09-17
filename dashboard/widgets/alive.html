@@ -1,5 +1,4 @@
 <div ng-controller="MqttStateCtrl">
-    <strong>{{context.topics}}</strong>
     <table border="1" margin="10 10" width="100%">
         <tr ng-repeat="record in records">
             <td ng-if="record.message" align="center" style="background-color:green;color:white;">{{record.topic.split("/")[1]}}</td>

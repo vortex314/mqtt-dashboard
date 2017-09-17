@@ -29,6 +29,13 @@ class MyMqtt {
             topics: this.topics
         }
     }
+
+    setConfig(config) {
+        this.host = config.host;
+        this.port = config.port;
+        this.use_TLS = config.tls;
+        this.topics = config.topics;
+    }
     //=======================================================================
     onConnected() {
         this.connected = true;

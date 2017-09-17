@@ -1,6 +1,6 @@
 var app = angular.module('mqtt-dashboard', ['oc.lazyLoad', 'nvd3', 'gridster', 'plunker.services', 'ui.bootstrap', 'ui.grid', 'ui.grid.resizeColumns', 'ngSanitize']);
 
-app.controller('MainCtrl', function ($scope, $timeout, $interval, DataService, $uibModal) {
+app.controller('MainCtrl', function ($scope, $http, $window, $timeout, $interval, DataService, $uibModal, $http) {
 
   $scope.gridsterOptions = {
     margins: [1, 1],
@@ -106,6 +106,25 @@ app.controller('MainCtrl', function ($scope, $timeout, $interval, DataService, $
     }]
   };
 
+  $scope.copyObject = function (o) {
+    var output, v, key;
+    output = Array.isArray(o) ? [] : {};
+    for (key in o) {
+      v = o[key];
+      output[key] = (typeof v === "object") ? $scope.copyObject(v) : v;
+    }
+    return output;
+  }
+
+  $scope.loadLayout = function (newDashboard) {
+    while ($scope.dashboard.widgets.length > 0) {
+      $scope.dashboard.widgets.pop();
+    };
+    for (key in newDashboard.widgets) {
+      $scope.dashboard.widgets.push(newDashboard.widgets[key]);
+    }
+  }
+
   $scope.addWidget = function () {
     $scope.dashboard.widgets.push({
       col: 4,
@@ -139,13 +158,66 @@ app.controller('MainCtrl', function ($scope, $timeout, $interval, DataService, $
     });
   };
 
-  $scope.saveLayout = function () {
+  $scope.dashboardName = $window.localStorage.getItem("dashboard");
+  $scope.dashboardName = "https://api.myjson.com/bins/nxjxx"
+
+  $scope.saveDashboard = function () {
     log("saving layout ... ");
-    var config = $scope.mqtt.getConfig();
-    config.layout = $scope.dashboard;
-    config.updated = new Date();
-    log(JSON.stringify(config));
-    $scope.mqtt.publish("src/dashboards/test/1", JSON.stringify(config), 1, true);
+    var config = {};
+    config.meta = {
+      subject: "mqtt-dashboard",
+      github: "https://github.com/vortex314/mqtt-dashboard",
+      demo: "https://vortex314.github.io/dashboard/index.html",
+      updated: new Date()
+    }
+    config.mqtt = $scope.mqtt.getConfig();
+    config.dashboard = $scope.copyObject($scope.dashboard);
+
+    var url = "https://api.myjson.com/bins";
+    var method = "POST";
+    if ($scope.dashboardName != "undefined") {
+      url = $scope.dashboardName;
+      method = "PUT";
+    }
+
+
+    $http({
+      method: method,
+      url: url,
+      headers: {
+        'Content-Type': "application/json;charset=utf-8"
+      },
+      data: config
+    }).then(function success(response) {
+      console.log(response.data);
+      $window.localStorage.setItem("dashboard", response.data.uri);
+      $scope.dashboardName = response.data.uri;
+    }, function error(response) {
+      console.log(JSON.stringify(response))
+    });
+  }
+
+  $scope.loadDashboard = function (name) {
+    var url = name;
+    $http({
+      method: "GET",
+      url: name,
+      headers: {
+        'Content-Type': "application/json;charset=utf-8"
+      }
+    }).then(function success(response) {
+      // mqtt disconenct, change config , connect
+      var config = response.data;
+      $scope.mqtt.disconnect();
+      $scope.mqtt.setConfig(config.mqtt);
+      $scope.mqtt.connect();
+      // dashboard layout erase, fill
+      $scope.loadLayout(config.dashboard);
+      console.log(response.data);
+      $window.localStorage.setItem("dashboard", response.data.uri);
+    }, function error(response) {
+      console.log(JSON.stringify(response))
+    });
   }
   //=================================================================================
   $scope.clear = function () {
@@ -183,9 +255,10 @@ app.controller('MainCtrl', function ($scope, $timeout, $interval, DataService, $
   // ================================= EB part
   eb = Minibus.create();
 
+
   eb.on(".*", function (arg) {
     log('EB => ' + JSON.stringify(arg));
-    $scope.ebMessage = JSON.stringify(arg);
+    //    $scope.ebMessage = JSON.stringify(arg);
     //   $scope.safeApply();
   });
   eb.emit("test eb", {
@@ -205,6 +278,17 @@ app.controller('MainCtrl', function ($scope, $timeout, $interval, DataService, $
       this.$apply(fn);
     }
   };
+
+
+  $scope.ebMessage = "Logging";
+
+  $scope.logger = function (s) {
+    $scope.ebMessage = s;
+    $scope.safeApply();
+  }
+
+  setLogger($scope.logger);
+
   $interval(function () {
     $scope.safeApply();
   }, 1000);

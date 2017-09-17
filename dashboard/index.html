@@ -77,7 +77,8 @@
         <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="mqtt.subscribe('#')" ng-disabled="!mqtt.connected">Subscribe #</button>
         <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="mqttSubscriptionsClear()" ng-disabled="mqtt.connected">Clear subscriptions</button>
         <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="addWidget()">Add Widget</button>
-        <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="saveLayout()">Save Layout <span class="glyphicon glyphicon-floppy-disk"></span></button>
+        <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="saveDashboard()">Save Dashboard <span class="glyphicon glyphicon-floppy-disk"></span></button>
+        <button class="col-md-1 btn btn-primary btn-xs" type="button" ng-click="loadDashboard(dashboardName)">Load Dashboard {{dashboardName}}</button>
         <div>{{mqtt.name}}</div>
       </div>
     </form>

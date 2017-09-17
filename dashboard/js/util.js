@@ -32,15 +32,35 @@ function log_stack() {
     console.log(stack);
 }
 
+oldConsoleLogger = console.log;
+
+function nullLogger(s) {
+
+}
+
+function consoleLogger(s) {
+    var line = " I " + timeString() + " | " + s;
+    console.log(line);
+    if (logFunction) logFunction(line);
+}
+
+logFunction = nullLogger;
+
+function setLogger(f) {
+    logFunction = f;
+}
+
 function log(s) {
-    console.log(" I " + timeString() + " | " + s);
+    logFunction(" I " + timeString() + " | " + s);
     //    $('#log').html(new Date() + " | " + s);
 }
 
 function warn(s) {
-    console.error("W " + timeString() + " | " + s);
+    logFunction("W " + timeString() + " | " + s);
     //    $('#log').html(new Date() + " | " + s);
 }
+
+
 
 
 
