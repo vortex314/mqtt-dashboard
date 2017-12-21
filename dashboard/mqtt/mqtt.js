@@ -30,7 +30,25 @@ class MyMqtt {
         }
     }
 
+    setConnectionString(conn) {
+        try {
+            if (conn.startsWith("ws://")) this.use_TLS = false;
+            if (conn.startsWith("wss://")) this.use_TLS = true;
+            var parts = conn.split("://");
+            var host = parts[1].split(":")[0];
+            var port = parseInt(parts[1].split(":")[1].split('/')[0]);
+            var path = "/" + parts[1].split(":")[1].split('/')[1];
+
+            this.host = host;
+            this.port = port;
+            this.path = path;
+        } catch (error) {
+            log(" parsing connection string fails ");
+        }
+    }
+
     setConfig(config) {
+
         this.host = config.host;
         this.port = config.port;
         this.use_TLS = config.tls;
@@ -82,9 +100,11 @@ class MyMqtt {
     //=======================================================================
     disconnect() {
         log("mqtt disconnect");
-        this.autoReconnect = false;
-        this.connected = false;
-        this.mqtt.disconnect();
+        if (this.connected) {
+            this.autoReconnect = false;
+            this.connected = false;
+            this.mqtt.disconnect();
+        }
     }
 
     //=======================================================================
@@ -134,6 +154,12 @@ class MyMqtt {
     //=======================================================================
     onMessageArrived(message) {
         var topic = message.destinationName;
+        try {
+            var payload = JSON.parse(message.payloadString);
+        } catch (error) {
+            console.log("ERROR invalid mqtt message, JSON parsing failed on topic  " + message.destinationName)
+            return;
+        }
         eb.emit(topic, { "topic": message.destinationName, "message": message.payloadString });
         //        eb.emitLocal("mqtt/publish", { "topic": message.destinationName, "message": message.payloadString });
     }

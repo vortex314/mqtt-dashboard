@@ -291,13 +291,19 @@ app.controller('MainCtrl', function ($scope, $http, $window, $timeout, $interval
   }, 1000);
   // ================================= MQTT connection PART
 
-  $scope.mqttHostPorts = ["limero.ddns.net:1884", "limero.ddns.net:1886", "test.mosquitto.org:8080", "broker.mqttdashboard.com:8000", "test.mosca.io:80", "broker.hivemq.com:8000", "iot.eclipse.org:80"];
-  $scope.mqttHostPort = "limero.ddns.net:1886";
+  $scope.mqttHostPorts = ["ws://limero.ddns.net:1884/mqtt",
+    "wss://limero.ddns.net:1886/mqtt",
+    "ws://test.mosquitto.org:8080/ws",
+    "ws://broker.mqttdashboard.com:8000/",
+    "ws://test.mosca.io:80/",
+    "ws://broker.hivemq.com:8000/",
+    "ws://iot.eclipse.org:80/"];
+  $scope.mqttHostPort = "wss://limero.ddns.net:1886/mqtt";
   $scope.mqtt = new MyMqtt("limero.ddns.net", 1886);
+  $scope.mqtt.setConnectionString($scope.mqttHostPort);
 
   $scope.mqttConnect = function () {
-    $scope.mqtt.host = $scope.mqttHostPort.split(':')[0];
-    $scope.mqtt.port = Number($scope.mqttHostPort.split(':')[1]);
+    $scope.mqtt.setConnectionString($scope.mqttHostPort);
     $scope.mqtt.connect();
     //    $scope.mqtt.subscribe("#");
     //   $scope.mqtt.subscribe("$SYS/broker/uptime");
@@ -311,6 +317,7 @@ app.controller('MainCtrl', function ($scope, $http, $window, $timeout, $interval
   }
   $scope.mqttConnectionChange = function () {
     log(" selection change : " + $scope.mqttHostPort);
+    $scope.mqtt.setConnectionString($scope.mqttHostPort);
     if ($scope.mqtt.connected) {
       $scope.mqttDisconnect();
       $scope.mqttConnect();
